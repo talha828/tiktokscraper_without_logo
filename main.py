@@ -3,6 +3,26 @@ import time
 from bs4 import BeautifulSoup
 import requests
 from urllib.request import urlopen
+import re
+
+
+def removeSpecialCharacters(title):
+    # Define a regular expression pattern to match special characters
+    pattern = r'[^\w\s.-]'
+
+    # Check if the title contains any special characters
+    if re.search(pattern, title):
+        invalid_chars = ['?', '#', '!', '😔', '💔', '🖤', '>','<', ':', '*', '|', '\\', '/', '"']
+        for char in invalid_chars:
+            title = title.replace(char, "")
+
+        # Remove leading or trailing whitespaces
+        title = title.strip()
+
+        # Replace any remaining whitespace with underscores
+        title = title.replace(" ", "_")
+
+    return title
 
 
 def downloadVideo(link, id):
@@ -52,12 +72,12 @@ def downloadVideo(link, id):
     downloadSoup = BeautifulSoup(response.text, "html.parser")
 
     downloadLink = downloadSoup.a["href"]
-    videoTitle = downloadSoup.p.getText().strip()
+    videoTitle = removeSpecialCharacters(downloadSoup.p.getText().strip())
 
     print("STEP 5: Saving the video :)")
     mp4File = urlopen(downloadLink)
     # Feel free to change the download directory
-    with open(f"datascientist_memes/{id}-{videoTitle}.mp4", "wb") as output:
+    with open(f"6xturi/{id}-{videoTitle}.mp4", "wb") as output:
         while True:
             data = mp4File.read(4096)
             if data:
@@ -69,7 +89,7 @@ def downloadVideo(link, id):
 print("STEP 1: Open Chrome browser")
 driver = webdriver.Chrome()
 
-driver.get("https://www.tiktok.com/@datascientist_memes")
+driver.get("https://www.tiktok.com/@6xturi")
 
 time.sleep(20)
 
